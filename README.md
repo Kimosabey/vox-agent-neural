@@ -41,6 +41,14 @@ Navigate to: `http://localhost:5173`
 
 ---
 
+## 🖼️ Preview
+
+![VoxAgent Neural Hero](./docs/images/project_hero.png)
+
+*The VoxAgent Neural Control Plane: A high-performance, agentic interface for real-time speech intelligence.*
+
+---
+
 ## 📸 System Visualization
 
 ### Neural Data Flow

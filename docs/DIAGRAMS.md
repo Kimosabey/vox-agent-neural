@@ -4,6 +4,22 @@
 
 ---
 
+## 🎨 Project Interface (Hero)
+
+### 0. Primary Control Plane
+![VoxAgent Neural Hero](./images/project_hero.png)
+
+**Shows:**
+- Modern Agentic UI in Dark Mode
+- Choice of architectural nodes (Hybrid, Agent, Direct)
+- Live telemetry badges (TAT expectations)
+- Premium glassmorphic navigation
+- Neural Agent SVG branding
+
+**Use Case:** High-level project preview / Portfolio Hero
+
+---
+
 ## 📊 System Architecture
 
 ### 1a. Current Implementation (Hybrid)
@@ -142,6 +158,7 @@
 
 | # | Image | File | Purpose |
 |---|-------|------|---------|
+| 0 | Project Hero | `project_hero.png` | Primary UI/UX Showcase |
 | 1 | System Architecture | `system_architecture_flow.png` | Complete system overview |
 | 2 | iOS Solutions | `ios_solution_approaches.png` | iOS compatibility guide |
 | 3 | Data Flow Timeline | `data_flow_diagram.png` | Performance & timing |
