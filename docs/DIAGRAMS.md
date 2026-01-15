@@ -7,7 +7,7 @@
 ## 🎨 Project Interface (Hero)
 
 ### 0. Primary Control Plane
-![VoxAgent Neural Hero](./images/project_hero.png)
+![VoxAgent Neural Hero](./assets/project_hero.png)
 
 **Shows:**
 - Modern Agentic UI in Dark Mode
@@ -23,13 +23,13 @@
 ## 📊 System Architecture
 
 ### 1a. Current Implementation (Hybrid)
-![Current Hybrid Architecture](./images/current_hybrid_architecture.png)
+![Current Hybrid Architecture](./assets/current_hybrid_architecture.png)
 
 ### 1b. Recommended (WebSocket-Only)
-![System Architecture](./images/system_architecture_flow.png)
+![System Architecture](./assets/system_architecture_flow.png)
 
 ### 1c. Alternative (LiveKit Agents)
-![LiveKit Agents Architecture](./images/livekit_agents_architecture.png)
+![LiveKit Agents Architecture](./assets/livekit_agents_architecture.png)
 
 **Shows:**
 - Comparison of architectural patterns
@@ -44,7 +44,7 @@
 
 ### 2a. iOS Solution Decision Tree
 
-![iOS Solutions](./images/ios_solution_approaches.png)
+![iOS Solutions](./assets/ios_solution_approaches.png)
 
 **Shows:**
 - Platform detection (Is iOS?)
@@ -57,7 +57,7 @@
 - Final implementation step
 
 ### 2b. iOS Approach Technical Comparison
-![iOS Approaches](./images/ios_approach_comparison.png)
+![iOS Approaches](./assets/ios_approach_comparison.png)
 
 **Shows:**
 - Internal logic of all 4 approaches (Multi-Codec, Web Audio, React Native, PWA)
@@ -72,7 +72,7 @@
 
 ### 3. Data Flow Timeline
 
-![Data Flow Timeline](./images/data_flow_diagram.png)
+![Data Flow Timeline](./assets/data_flow_diagram.png)
 
 **Shows:**
 - 6 stages from User Speaks → Display Result
@@ -89,7 +89,7 @@
 
 ### 4. Frontend Component Flow
 
-![Component Flow](./images/component_flow.png)
+![Component Flow](./assets/component_flow.png)
 
 **Shows:**
 - React component hierarchy
@@ -106,7 +106,7 @@
 
 ### 5. WebSocket Message Flow
 
-![WebSocket Protocol](./images/websocket_protocol.png)
+![WebSocket Protocol](./assets/websocket_protocol.png)
 
 **Shows:**
 - Connection establishment
@@ -123,7 +123,7 @@
 
 ### 6. Responsive Design Breakpoints
 
-![Responsive Design](./images/responsive_design.png)
+![Responsive Design](./assets/responsive_design.png)
 
 **Shows:**
 - Mobile (< 768px)
@@ -140,7 +140,7 @@
 
 ### 7. User Flow Diagram
 
-![User Journey](./images/user_flow.png)
+![User Journey](./assets/user_flow.png)
 
 **Shows:**
 - Entry point (Home page)
@@ -175,7 +175,7 @@
 
 ### In Documentation
 ```markdown
-![Description](./images/filename.png)
+![Description](./assets/filename.png)
 ```
 
 ### In Presentations

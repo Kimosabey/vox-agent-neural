@@ -43,7 +43,7 @@ Navigate to: `http://localhost:5173`
 
 ## 🖼️ Preview
 
-![VoxAgent Neural Hero](./docs/images/project_hero.png)
+![VoxAgent Neural Hero](./docs/assets/project_hero.png)
 
 *The VoxAgent Neural Control Plane: A high-performance, agentic interface for real-time speech intelligence.*
 
@@ -52,10 +52,10 @@ Navigate to: `http://localhost:5173`
 ## 📸 System Visualization
 
 ### Neural Data Flow
-![Data Flow Diagram](docs/images/data_flow_diagram.png)
+![Data Flow Diagram](docs/assets/data_flow_diagram.png)
 
 ### Hybrid Architecture
-![Current Hybrid Architecture](docs/images/current_hybrid_architecture.png)
+![Current Hybrid Architecture](docs/assets/current_hybrid_architecture.png)
 
 ---
 
@@ -74,7 +74,7 @@ Navigate to: `http://localhost:5173`
 
 ### Neural Inference Pipeline
 
-![System Architecture](docs/images/system_architecture_flow.png)
+![System Architecture](docs/assets/system_architecture_flow.png)
 
 *The VoxAgent Neural inference pipeline ensures deterministic delivery of transcripts with optimized CPU utilization.*
 

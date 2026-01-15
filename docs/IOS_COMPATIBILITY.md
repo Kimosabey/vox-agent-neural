@@ -51,11 +51,11 @@ const mediaRecorder = new MediaRecorder(stream, {
 
 ### 🖼️ Visual Decision Guide
 
-![iOS Solution Approaches](./images/ios_solution_approaches.png)
+![iOS Solution Approaches](./assets/ios_solution_approaches.png)
 
 ### 📊 Comparative Analysis
 
-![iOS Approach Comparison](./images/ios_approach_comparison.png)
+![iOS Approach Comparison](./assets/ios_approach_comparison.png)
 
 | Approach | Compatibility | Complexity | Performance | Best For |
 |----------|---------------|------------|-------------|----------|

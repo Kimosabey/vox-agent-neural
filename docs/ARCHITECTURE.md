@@ -11,19 +11,19 @@
 ### Overview
 The current implementation uses **BOTH** LiveKit and WebSocket connections:
 
-![Current Hybrid Architecture](./images/current_hybrid_architecture.png)
+![Current Hybrid Architecture](./assets/current_hybrid_architecture.png)
 
 ### Components
 
 **Frontend Structure:**
-![Component Flow](./images/component_flow.png)
+![Component Flow](./assets/component_flow.png)
 
 - `useLiveKit.ts`: Manages both LiveKit room and WebSocket
 - LiveKit Client: Creates room, publishes audio track
 - WebSocket: Sends audio chunks, receives transcripts
 
 **Backend Protocol:**
-![WebSocket Protocol](./images/websocket_protocol.png)
+![WebSocket Protocol](./assets/websocket_protocol.png)
 
 - FastAPI: Serves API and WebSocket endpoint
 - WebSocket Handler: Receives audio, processes with Whisper
@@ -62,7 +62,7 @@ The current implementation uses **BOTH** LiveKit and WebSocket connections:
 
 ### Option 1: LiveKit Agents Pattern (Standard)
 
-![LiveKit Agents Architecture](./images/livekit_agents_architecture.png)
+![LiveKit Agents Architecture](./assets/livekit_agents_architecture.png)
 
 **Architecture:**
 
@@ -96,7 +96,7 @@ The current implementation uses **BOTH** LiveKit and WebSocket connections:
 
 ### Option 2: WebSocket-Only Pattern (Recommended)
 
-![System Architecture](./images/system_architecture_flow.png)
+![System Architecture](./assets/system_architecture_flow.png)
 
 **How it works:**
 1. Frontend gets microphone with `getUserMedia()`
@@ -223,7 +223,7 @@ recorder.ondataavailable = (e) => ws.send(e.data);
 
 ### Current Metrics (Optimized)
 
-![Data Flow Timeline](./images/data_flow_diagram.png)
+![Data Flow Timeline](./assets/data_flow_diagram.png)
 
 | Metric | Value | Notes |
 |--------|-------|-------|

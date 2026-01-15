@@ -72,6 +72,9 @@ vite.config.ts.*
 *.webp
 !frontend/public/**/*.png
 !frontend/public/**/*.jpg
+!docs/assets/**/*.png
+!docs/assets/**/*.jpg
+!docs/assets/**/*.svg
 
 # Package locks (too large, causes merge conflicts)
 # Include in git but be aware these can grow
