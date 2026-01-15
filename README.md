@@ -74,16 +74,9 @@ Navigate to: `http://localhost:5173`
 
 ### Neural Inference Pipeline
 
-```mermaid
-graph LR
-    A[Microphone] --> B[WebRTC/LiveKit Transport]
-    B --> C[FastAPI Gateway]
-    C --> D[Neural Scribe Agent]
-    D --> E{Faster-Whisper Model}
-    E --> F[Tokenized Text]
-    F --> G[WebSocket Egress]
-    G --> H[React Agentic UI]
-```
+![System Architecture](docs/images/system_architecture_flow.png)
+
+*The VoxAgent Neural inference pipeline ensures deterministic delivery of transcripts with optimized CPU utilization.*
 
 ### Performance Benchmarks
 - **Model**: Whisper `base` (140MB CTranslate2 Optimized)
@@ -108,8 +101,68 @@ graph LR
 ## 📚 Documentation
 
 - **[Architecture Deep Dive](./docs/ARCHITECTURE.md)** - Logic behind the Hybrid SFU/WebSocket pattern.
-- **[System Diagrams](./docs/DIAGRAMS.md)** - Comprehensive Mermaid and UML visualizations.
+- **[Visual Documentation](./docs/DIAGRAMS.md)** - High-fidelity system visualizations.
 - **[Mobile Compatibility](./docs/IOS_COMPATIBILITY.md)** - Strategies for low-latency audio on constrained hardware.
+
+---
+
+## 🏗️ Project Structure
+
+```
+vox-agent-neural/
+├── frontend/               # React + TS application
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── hooks/         # useLiveKit & useRecorder hooks
+│   │   ├── pages/         # Page components
+│   │   └── lib/           # Logic utilities
+│
+├── backend/               # FastAPI + Neural Scribe Engine
+│   ├── main.py           # Application entry & WS handler
+│   ├── requirements.txt  # Python dependency manifest
+│
+├── docs/                 # Product Documentation
+│   ├── ARCHITECTURE.md   # System analysis
+│   └── DIAGRAMS.md       # Visual guide
+│
+└── .env                  # Environment configuration
+```
+
+---
+
+## 🔐 Security & Reliability
+
+- [x] **Environment Isolation**: Secrets managed via strict `.env` injection.
+- [x] **CORS Gating**: Secure cross-origin resource sharing for specified domains.
+- [x] **Session Tokens**: JWT-based authentication for WebRTC room integrity.
+- [ ] **WSS Upgrade**: Transitioning to WebSocket Secure for production egress.
+- [ ] **Circuit Breaking**: Fallback logic for inference engine outages.
+
+---
+
+## 📝 API Reference (Control Plane)
+
+### WebSocket Node
+**URL**: `ws://localhost:8000/ws`
+
+**Inbound Payload:**
+```json
+{
+  "type": "audio_chunk",
+  "data": "base64_encoded_audio",
+  "timestamp": 0
+}
+```
+
+**Outbound Telemetry:**
+```json
+{
+  "type": "transcript",
+  "text": "transcribed telemetry",
+  "turnaround_ms": 2450,
+  "isFinal": true
+}
+```
 
 ---
 

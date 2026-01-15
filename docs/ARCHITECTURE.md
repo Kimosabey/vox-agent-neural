@@ -98,17 +98,6 @@ The current implementation uses **BOTH** LiveKit and WebSocket connections:
 
 ![System Architecture](./images/system_architecture_flow.png)
 
-**Architecture:**
-```
-┌─────────┐         ┌──────────────┐
-│ Frontend │◄───────►│ Backend      │
-│         │ WebSocket│              │
-│         │         │ ├─WebSocket  │
-│         │         │ ├─Whisper    │
-│         │         │ └─FFmpeg     │
-└─────────┘         └──────────────┘
-```
-
 **How it works:**
 1. Frontend gets microphone with `getUserMedia()`
 2. Audio chunks sent over WebSocket
