@@ -61,7 +61,12 @@ export default function Home() {
       >
         <div className="flex items-center gap-3">
           <div className="group h-9 w-9 flex items-center justify-center rounded-lg bg-card border border-border shadow-sm transition-all hover:scale-105 hover:border-primary/50 text-foreground">
-            <img src="/logo.svg" alt="Logo" className="h-6 w-6 object-contain transition-opacity" />
+            <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6">
+              <path d="M50 10L15 30V70L50 90L85 70V30L50 10Z" stroke="currentColor" strokeWidth="6" strokeLinejoin="round" />
+              <circle cx="50" cy="50" r="15" fill="currentColor" />
+              <path d="M50 35V20M50 80V65M35 50H20M80 50H65" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+              <path d="M40 40L30 30M70 70L60 60M70 30L60 40M40 60L30 70" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+            </svg>
           </div>
           <div className="flex flex-col justify-center">
             <span className="font-bold text-base tracking-tight text-foreground leading-none">
