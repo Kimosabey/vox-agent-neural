@@ -18,10 +18,10 @@ iOS Safari has **severe restrictions** on web audio APIs:
 
 ### Why This Matters
 
-Your speech practice app **must work on iOS** because:
+Your application **must work on iOS** because:
 - 📱 50%+ mobile users are on iPhone
-- 🎤 Speech practice is a mobile-first use case
-- 🚫 **Current implementation likely fails on iOS Safari**
+- 🎤 Speech transcription is a mobile-first use case
+- 🚫 **Standard MediaRecorder implementations often fail on iOS Safari**
 
 ---
 
@@ -189,7 +189,7 @@ self.addEventListener('fetch', (event) => {
 
 ## 🏆 Recommended Approach
 
-### For Your Speech Practice App:
+### Recommended Implementation Strategy:
 
 **Use Solution 1 + Solution 2 Hybrid:**
 

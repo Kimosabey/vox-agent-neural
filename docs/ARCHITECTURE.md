@@ -119,16 +119,16 @@ The current implementation uses **BOTH** LiveKit and WebSocket connections:
 - ❌ Manual connection management
 
 **Best for:**
-- ✅ **Speech practice apps** (your use case!)
+- ✅ **Real-time speech applications** 
 - Single-user applications
 - Prototypes & MVPs
 - Cost-sensitive projects
 
 ---
 
-## 🎯 Recommendation
+## 🎯 Final Recommendation
 
-### For VoxAgent Neural (Speech Practice App)
+### Architecture Selection
 
 **Use: WebSocket-Only Approach**
 
@@ -138,7 +138,7 @@ The current implementation uses **BOTH** LiveKit and WebSocket connections:
 2. **Perfect Fit**: Single-user speech practice doesn't need LiveKit features
 3. **Performance**: Lower latency, fewer network hops
 4. **Cost**: No LiveKit hosting costs
-5. **Your Current Code**: WebSocket already works perfectly!
+5. **Implementation**: WebSocket core already proven stable
 
 ### Migration Path
 
@@ -384,14 +384,14 @@ WebM (from browser) → FFmpeg → WAV (16kHz, mono) → Whisper
 
 ---
 
-## ✅ Final Recommendation
+## ✅ Conclusion
 
-### For VoxAgent Neural Project:
+### Final Project Recommendation
 
 **Migrate to WebSocket-Only Architecture**
 
 **Why:**
-1. Matches your use case perfectly (single-user speech practice)
+1. Matches the use case for non-collaborative sessions (single-user focus)
 2. Simpler = faster development & maintenance
 3. Lower costs (no LiveKit fees)
 4. Better performance (lower latency)
