@@ -72,11 +72,9 @@ Navigate to: `http://localhost:5173`
 
 ## 🏗️ Architecture
 
-### Neural Inference Pipeline
+![System Architecture](docs/assets/system_architecture_white.png)
 
-![System Architecture](docs/assets/system_architecture_flow.png)
-
-*The VoxAgent Neural inference pipeline ensures deterministic delivery of transcripts with optimized CPU utilization.*
+*The VoxAgent Neural inference pipeline: A high-fidelity overview of the agentic control plane and sub-second transcription flow.*
 
 ### Performance Benchmarks
 - **Model**: Whisper `base` (140MB CTranslate2 Optimized)
