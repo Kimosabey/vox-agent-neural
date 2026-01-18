@@ -1,423 +1,81 @@
-# Architecture Analysis & Recommendations
+# 🏗️ System Architecture
 
-**Project**: VoxAgent Neural - Agentic Transcription & Inference Engine
-**Date**: January 15, 2026
-**Technology Stack**: React + FastAPI + Faster-Whisper + LiveKit Agents / WebSockets
+## 1. High-Level Design (HLD)
 
----
+VoxAgent Neural operates as a **Hybrid Control Plane** that orchestrates real-time audio (UDP) and reliable text data (TCP). It decouples the "Ear" (Frontend) from the "Brain" (Backend) using an Agentic Pattern.
 
-## 🏗️ Current Architecture (Hybrid Approach)
+```mermaid
+graph TD
+    User([👤 User / Microphone]) -->|RTP Audio (UDP)| LiveKit[☁️ LiveKit SFU]
+    
+    subgraph "The Neural Agent"
+        Agent[🐍 Python Controller] -->|Subscribe Track| LiveKit
+        Agent -->|1. VAD Check| CPU[Logic Gate]
+        CPU -->|2. Quantized Inference| Model[Faster-Whisper (INT8)]
+        Model -->|3. Text Event| WS[WebSocket Server]
+    end
+    
+    WS -->|Transcript (TCP)| User
+```
 
-### Overview
-The current implementation uses **BOTH** LiveKit and WebSocket connections:
-
-![Current Hybrid Architecture](./assets/current_hybrid_architecture.png)
-
-### Components
-
-**Frontend Structure:**
-![Component Flow](./assets/component_flow.png)
-
-- `useLiveKit.ts`: Manages both LiveKit room and WebSocket
-- LiveKit Client: Creates room, publishes audio track
-- WebSocket: Sends audio chunks, receives transcripts
-
-**Backend Protocol:**
-![WebSocket Protocol](./assets/websocket_protocol.png)
-
-- FastAPI: Serves API and WebSocket endpoint
-- WebSocket Handler: Receives audio, processes with Whisper
-- Whisper Model: `base` model with CPU inference (INT8)
-- FFmpeg: Converts WebM → WAV for Whisper
-
-### Data Flow
-
-1. User clicks Record
-2. Frontend establishes LiveKit room + WebSocket
-3. Microphone audio captured via LiveKit track
-4. Audio chunks (3-second intervals) sent over WebSocket
-5. Backend converts WebM → WAV → Whisper transcription
-6. Transcript sent back over WebSocket
-7. UI displays result
-
-### Issues with Current Approach
-
-⚠️ **Redundancy:**
-- LiveKit creates rooms but isn't used for transcription
-- WebSocket does all the actual work
-- Two connections for what one could do
-
-⚠️ **Complexity:**
-- More code to maintain
-- LiveKit costs (cloud hosting)
-- Harder to debug connection issues
-
-⚠️ **Non-Standard:**
-- LiveKit is designed for agent-based transcription
-- Current usage doesn't leverage LiveKit's strengths
+### Core Components
+1.  **Frontend (React Agent)**: Manages the WebRTC connection state and renders the "Stealth UI" (a minimalist, distraction-free interface).
+2.  **LiveKit Cloud (SFU)**: Handles NAT traversal, bitrate adaptation, and packet loss concealment.
+3.  **Neural Engine (FastAPI)**: A Python service running the `faster-whisper` inference loop and a WebSocket broadcaster.
+4.  **Quantized Model**: An optimized CTranslate2 version of OpenAI's Whisper `base` model, capable of running on non-GPU instances.
 
 ---
 
-## 📊 Alternative Approaches
+## 2. Low-Level Design (LLD)
 
-### Option 1: LiveKit Agents Pattern (Standard)
+### The Inference Pipeline
+To achieve sub-second latency without a GPU:
+1.  **Ingestion**: Audio arrives as Opus frames via LiveKit `AudioStream`.
+2.  **Transcoding**: `FFmpeg` converts Opus (48kHz) to PCM (16kHz Mono) in RAM.
+3.  **Buffering**: A customized `RollingWindow` collects 3 seconds of audio.
+4.  **Inference**:
+    *   **Beam Size**: 1 (Greedy decoding for speed).
+    *   **Temperature**: 0 (Deterministic).
+    *   **Compute**: INT8 (Vectorized CPU instructions).
+5.  **Egress**: Text JSON pushed to WebSocket clients.
 
-![LiveKit Agents Architecture](./assets/livekit_agents_architecture.png)
-
-**Architecture:**
-
-**How it works:**
-1. Frontend publishes audio to LiveKit room
-2. LiveKit Agent subscribes to audio track
-3. Agent processes with Whisper
-4. Results sent via LiveKit Data Channel
-5. Frontend receives transcripts
-
-**Pros:**
-- ✅ Standard LiveKit pattern
-- ✅ Built-in recording capabilities
-- ✅ Multi-user support
-- ✅ Scalable infrastructure
-- ✅ Security features (E2E encryption)
-
-**Cons:**
-- ❌ More complex setup
-- ❌ LiveKit cloud costs
-- ❌ Heavier infrastructure
-- ❌ Overkill for single-user apps
-
-**Best for:**
-- Multi-user rooms
-- Production applications
-- Need recording/playback
-- Enterprise features required
-
----
-
-### Option 2: WebSocket-Only Pattern (Recommended)
-
-![System Architecture](./assets/system_architecture_flow.png)
-
-**How it works:**
-1. Frontend gets microphone with `getUserMedia()`
-2. Audio chunks sent over WebSocket
-3. Backend processes with Whisper
-4. Transcripts returned over same WebSocket
-5. Single persistent connection
-
-**Pros:**
-- ✅ **Simplest architecture**
-- ✅ **Lowest latency** (direct connection)
-- ✅ **No external dependencies**
-- ✅ **Easy to debug**
-- ✅ **Lower costs** (no LiveKit)
-- ✅ **Perfect for speech practice**
-
-**Cons:**
-- ❌ No built-in multi-user support
-- ❌ No built-in recording (can add manually)
-- ❌ Manual connection management
-
-**Best for:**
-- ✅ **Real-time speech applications** 
-- Single-user applications
-- Prototypes & MVPs
-- Cost-sensitive projects
-
----
-
-## 🎯 Final Recommendation
-
-### Architecture Selection
-
-**Use: WebSocket-Only Approach**
-
-**Reasons:**
-
-1. **Simplicity**: 50% less code, easier maintenance
-2. **Perfect Fit**: Single-user speech practice doesn't need LiveKit features
-3. **Performance**: Lower latency, fewer network hops
-4. **Cost**: No LiveKit hosting costs
-5. **Implementation**: WebSocket core already proven stable
-
-### Migration Path
-
-**Remove:**
-- LiveKit client dependency
-- Room creation/management code
-- LiveKit token generation API
-
-**Keep:**
-- WebSocket connection (already working)
-- Whisper transcription backend
-- Current UI/UX
-
-**Add:**
-- Direct `getUserMedia()` for microphone
-- Simplified connection management
-
----
-
-## 🔧 Implementation Comparison
-
-### Current (Hybrid)
-
-**Frontend Dependencies:**
+### Data Schema (Transcription Event)
 ```json
 {
-  "livekit-client": "^2.x",
-  // ...other deps
+  "type": "transcription",
+  "id": "uuid-v4",
+  "text": "Hello world.",
+  "is_final": true,
+  "confidence": 0.98,
+  "metrics": {
+    "audio_duration": 2.45,
+    "inference_time": 0.32
+  }
 }
 ```
 
-**Connection Code:**
-```typescript
-// Create LiveKit room
-const room = new Room();
-await room.connect(url, token);
+---
 
-// Also create WebSocket
-const ws = new WebSocket('/ws');
+## 3. Decision Log
 
-// Send audio via WebSocket (not LiveKit!)
-ws.send(audioChunk);
-```
-
-**Issues:**
-- LiveKit room created but not used
-- WebSocket does all the work
-- Redundant connections
+| Decision | Alternative | Reason for Choice |
+| :--- | :--- | :--- |
+| **Hybrid (LiveKit + WS)** | Pure WebSockets | **Quality**. Sending raw audio over WebSocket (TCP) causes "Head-of-Line Blocking" on poor networks. LiveKit (UDP) allows audio to skip dropped packets, maintaining real-time flow. |
+| **Faster-Whisper** | OpenAI Cloud API | **Latency & Privacy**. Cloud APIs add ~500ms network RTT and expose user data. Local inference allows for "Interim Results" (seeing the text appear as you speak). |
+| **Process Separation** | Monolith | **Scale**. We run the Inference Engine as a separate process. If the AI crashes (OOM), the WebSocket connection remains alive to tell the user "System Rebooting". |
 
 ---
 
-### Recommended (WebSocket-Only)
+## 4. Key Patterns
 
-**Frontend Dependencies:**
-```json
-{
-  // No LiveKit needed!
-}
-```
+### The "Turnaround Time" (TAT) Metric
+We treat Lag as a first-class citizen.
+*   Every audio chunk is stamped with `t0` (Client Time).
+*   The text result includes `t1` (Processing Time).
+*   The UI calculates `Delta = t1 - t0`.
+*   **Feedback**: If Delta > 2000ms, the UI glows Orange to warn the user: "You are speaking faster than I can think."
 
-**Connection Code:**
-```typescript
-// Simple WebSocket
-const ws = new WebSocket('/ws');
-
-// Direct microphone access
-const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-const recorder = new MediaRecorder(stream);
-
-// Send audio chunks
-recorder.ondataavailable = (e) => ws.send(e.data);
-```
-
-**Benefits:**
-- ✅ Cleaner code
-- ✅ One connection
-- ✅ Simpler logic
-
----
-
-## 📈 Performance Metrics
-
-### Current Metrics (Optimized)
-
-![Data Flow Timeline](./assets/data_flow_diagram.png)
-
-| Metric | Value | Notes |
-|--------|-------|-------|
-| **Connection Setup** | ~3-5 seconds | LiveKit + WebSocket |
-| **Transcription TAT** | 2-5 seconds | Optimized Whisper |
-| **Total Latency** | 5-10 seconds | Speech → Transcript |
-| **Memory Usage** | ~500MB | Base model + connections |
-| **Chunk Size** | 40KB minimum | Filter small chunks |
-
-### Optimizations Applied
-
-1. **Whisper Speed:**
-   - Disabled compression ratio checks
-   - Disabled quality retries
-   - Single-pass decoding (temperature=0)
-   - Result: 10x faster (37s → 3s)
-
-2. **Connection Management:**
-   - Persistent room (no reconnection)
-   - Instant record/stop toggle
-   - Smart chunk filtering (>40KB)
-
-3. **UI Performance:**
-   - Animated audio visualizer (60fps)
-   - Color-coded levels
-   - Real-time percentage display
-
----
-
-## 🛠️ Technology Stack Details
-
-### Backend
-
-**Framework:** FastAPI
-```python
-# WebSocket endpoint
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    # Handle audio chunks
-    # Process with Whisper
-    # Return transcripts
-```
-
-**Whisper Configuration:**
-```python
-WhisperModel(
-    "base",  # 140MB, balanced accuracy/speed
-    device="cpu",
-    compute_type="int8",  # Quantized for speed
-    # Optimizations:
-    compression_ratio_threshold=None,  # No retries
-    temperature=0.0,  # Deterministic
-    beam_size=1  # Fast decoding
-)
-```
-
-**Audio Processing:**
-```
-WebM (from browser) → FFmpeg → WAV (16kHz, mono) → Whisper
-```
-
-### Frontend
-
-**Framework:** React + TypeScript + Vite
-
-**UI Library:** Tailwind CSS + shadcn/ui
-
-**State Management:**
-- Custom hooks (`useLiveKit`)
-- React state for UI
-- No external state library needed
-
-**Audio Capture:**
-- MediaRecorder API (WebM/Opus codec)
-- 3-second chunks
-- Real-time level monitoring
-
----
-
-## 🔐 Security Considerations
-
-### Current Security
-
-**LiveKit:**
-- ✅ JWT token authentication
-- ✅ E2E encryption (not used)
-- ✅ Room isolation
-
-**WebSocket:**
-- ⚠️ No built-in authentication
-- ⚠️ No encryption (use WSS in production)
-
-### Recommendations
-
-1. **Use WSS** (WebSocket Secure) in production
-2. **Add authentication** to WebSocket connection
-3. **Rate limiting** to prevent abuse
-4. **Input validation** for audio chunks
-5. **CORS** properly configured
-
----
-
-## 💰 Cost Analysis
-
-### LiveKit Costs (Current)
-
-**Free Tier:**
-- 10,000 participant minutes/month
-- Good for development
-
-**Paid:**
-- ~$0.004/minute after free tier
-- Additional costs for recording, egress
-
-### WebSocket-Only Costs
-
-**Infrastructure:**
-- Server hosting only
-- No per-minute charges
-- Predictable costs
-
-**Estimated Savings:**
-- Development: $0 (both free)
-- Production (1000 users): **$200-500/month saved**
-
----
-
-## 🚀 Future Considerations
-
-### If You Need Multi-User Features
-
-**Then** switch to LiveKit Agents Pattern:
-- Multiple participants in room
-- Collaborative transcription
-- Shared playback
-- Recording storage
-
-### If Staying Single-User
-
-**Enhance** WebSocket-Only:
-- Add authentication layer
-- Implement session management
-- Add transcript storage (database)
-- Export functionality (already done!)
-
----
-
-## 📝 Decision Matrix
-
-| Use Case | Current | LiveKit | WebSocket |
-|----------|---------|---------|-----------|
-| **Single-user speech practice** | ⚠️ Overkill | ❌ Overkill | ✅ **Perfect** |
-| **Multi-user rooms** | ⚠️ Half-implemented | ✅ **Best** | ❌ Need extra work |
-| **Simple prototype** | ❌ Complex | ❌ Complex | ✅ **Best** |
-| **Enterprise app** | ⚠️ Mixed | ✅ **Best** | ⚠️ Need features |
-| **Low budget** | ⚠️ Medium cost | ❌ Higher cost | ✅ **Lowest** |
-| **Quick to market** | ⚠️ Moderate | ❌ Slower | ✅ **Fastest** |
-
----
-
-## ✅ Conclusion
-
-### Final Project Recommendation
-
-**Migrate to WebSocket-Only Architecture**
-
-**Why:**
-1. Matches the use case for non-collaborative sessions (single-user focus)
-2. Simpler = faster development & maintenance
-3. Lower costs (no LiveKit fees)
-4. Better performance (lower latency)
-5. Your WebSocket code already works great!
-
-**Timeline:**
-- Refactoring: 2-4 hours
-- Testing: 1-2 hours
-- Result: Cleaner, faster, simpler application
-
-**Risk Assessment:**
-- Risk: **Low** (WebSocket already proven to work)
-- Effort: **Medium** (code removal + minor changes)
-- Benefit: **High** (simplicity + cost savings)
-
----
-
-## 📚 References
-
-- [LiveKit Agents Documentation](https://docs.livekit.io/agents/)
-- [Faster-Whisper GitHub](https://github.com/guillaumekln/faster-whisper)
-- [WebSocket API MDN](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
-- [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder)
-
----
-
-**Document Version**: 1.0  
-**Last Updated**: January 15, 2026  
-**Author**: Harshan Aiyappa — Senior Hybrid Engineer
+### Agentic State Sync
+The Frontend doesn't just "show text". It mirrors the Agent's state.
+`Connecting` -> `Handshaking` -> `Listening` -> `Thinking` -> `Cooldown`.
+This prevents the "Is it working?" confusion common in voice apps.
